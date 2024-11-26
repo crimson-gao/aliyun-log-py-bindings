@@ -19,7 +19,7 @@ unset CONDA_PREFIX
 
 # 运行 cargo fix 和 cargo fmt
 echo 'Running cargo fix...'
-cargo fix
+#cargo fix
 
 echo 'Running cargo fmt...'
 cargo fmt

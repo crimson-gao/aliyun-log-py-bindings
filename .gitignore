@@ -76,3 +76,4 @@ docs/_build/
 aliyun_log_py_bindings/**/*.so
 aliyun_log_py_bindings/**/*.dylib
 aliyun_log_py_bindings/**/*.dll
+test/.svg

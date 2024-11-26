@@ -33,7 +33,7 @@ def test_logs_to_flat_json_str(benchmark):
 
 
 def lz4_logs_to_flat_json_str():
-    log_parser.lz4_logs_to_flat_json_str(compressed)
+    log_parser.lz4_logs_to_flat_json_str(compressed, raw_size)
 
 
 def test_lz4_logs_to_flat_json_str(benchmark):
