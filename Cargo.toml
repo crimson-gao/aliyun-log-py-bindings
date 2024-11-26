@@ -1,6 +1,6 @@
 [package]
-name = "aliyun-log-py-bindings"
-version = "0.1.0"
+name = "aliyun_log_py_bindings"
+version = "0.0.1"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -9,14 +9,18 @@ name = "aliyun_log_py_bindings"
 crate-type = ["cdylib"]
 
 [dependencies]
-prost = "0.13.3"
+prost = "^0.13.3"
+lz4 = "^1.28.0"
+serde_json = "^1.0.133"
+thiserror = "^2.0.3"
+
+[dev-dependencies]
 
 [dependencies.pyo3]
-version = "0.23.1"
+version = "^0.23.1"
 features = ["abi3-py37"]
 
 
 [build-dependencies]
-prost-build = "0.13.3"
-
+prost-build = "^0.13.3"
 

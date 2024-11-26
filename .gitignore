@@ -70,3 +70,9 @@ docs/_build/
 
 # Pyenv
 .python-version
+
+.benchmarks/
+
+aliyun_log_py_bindings/**/*.so
+aliyun_log_py_bindings/**/*.dylib
+aliyun_log_py_bindings/**/*.dll
