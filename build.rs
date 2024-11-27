@@ -10,6 +10,10 @@ fn main() {
         protoc_path.to_str().unwrap()
     );
     std::env::set_var("PROTOC", protoc_path);
-
-    prost_build::compile_protos(&["src/logs.proto"], &["src/"]).unwrap();
+    let mut config = prost_build::Config::new();
+    config.bytes(&["."]);
+    config
+        .compile_protos(&["src/logs.proto"], &["src/"])
+        .unwrap();
+    // prost_build::compile_protos(&["src/logs.proto"], &["src/"]).unwrap();
 }

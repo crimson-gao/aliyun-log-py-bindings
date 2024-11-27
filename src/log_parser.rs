@@ -47,37 +47,35 @@ pub(crate) fn lz4_logs_to_flat_json(
 }
 
 fn logs_to_flat_json_value(log_group_list: pb::LogGroupListPb) -> Value {
-    let mut logs = vec![];
+    let mut logs = Vec::with_capacity(log_group_list.log_groups.len());
     for log_group in log_group_list.log_groups {
         let tag_kvs: Vec<(String, &str)> = log_group
             .log_tags
             .iter()
             .map(|log_tag| {
-                (
-                    format!("__tag__:{}", log_tag.key).to_string(),
-                    log_tag.value.as_str(),
-                )
+                let key = format!("__tag__:{}", log_tag.key);
+                (key, log_tag.value.as_str())
             })
             .collect();
-        let topic = log_group.topic;
-        let source = log_group.source;
+        let topic = log_group.topic.as_deref();
+        let source = log_group.source.as_deref();
         for log in log_group.logs {
-            let mut m = Map::new();
+            let mut m = Map::with_capacity(4 + tag_kvs.len() + log.contents.len());
             for content in log.contents {
                 m.insert(content.key, Value::from(content.value));
             }
             m.insert("__time__".to_string(), Value::from(log.time));
-            if let Some(ref t) = topic {
-                m.insert("__topic__".to_string(), Value::from(t.clone()));
+            if let Some(t) = topic {
+                m.insert("__topic__".to_string(), Value::from(t));
             }
-            if let Some(ref s) = source {
-                m.insert("__source__".to_string(), Value::from(s.clone()));
+            if let Some(s) = source {
+                m.insert("__source__".to_string(), Value::from(s));
             }
             if let Some(ns) = log.time_ns {
                 m.insert("__time_ns__".to_string(), Value::from(ns));
             }
             for (k, v) in &tag_kvs {
-                m.insert(k.to_string(), Value::from(*v));
+                m.insert(k.clone(), Value::from(*v));
             }
             logs.push(Value::Object(m));
         }
@@ -94,44 +92,52 @@ fn log_group_list_to_flat_json_py(
     time_as_str: bool,
     decode_utf8: bool,
 ) -> PyResult<PyObject> {
-    let py_list = PyList::empty(py);
-    for log_group in log_group_list.log_groups {
-        let tag_kvs: Vec<(String, &String)> = log_group
-            .log_tags
-            .iter()
-            .map(|log_tag| {
-                (
-                    format!("__tag__:{}", log_tag.key).to_string(),
-                    &log_tag.value,
-                )
-            })
-            .collect();
-        let topic = log_group.topic;
-        let source = log_group.source;
-        let py_dict = PyDict::new(py);
-        for log in log_group.logs {
-            py_dict.set_item("__time__", get_time_py_object(py, log.time, time_as_str)?)?;
-            if let Some(ns) = log.time_ns {
-                py_dict.set_item("__time_ns__", get_time_py_object(py, ns, time_as_str)?)?;
+    fn to_py_dict_vec(
+        py: Python,
+        log_group_list: pb::LogGroupListRawPb,
+        time_as_str: bool,
+        decode_utf8: bool,
+    ) -> PyResult<Vec<Bound<PyDict>>> {
+        let mut vec = Vec::with_capacity(log_group_list.log_groups.len());
+        for log_group in log_group_list.log_groups {
+            let tag_kvs: Vec<(String, &String)> = log_group
+                .log_tags
+                .iter()
+                .map(|log_tag| {
+                    let key = format!("__tag__:{}", log_tag.key);
+                    (key, &log_tag.value)
+                })
+                .collect();
+            let topic = log_group.topic.as_deref();
+            let source = log_group.source.as_deref();
+            let py_dict = PyDict::new(py);
+            for log in log_group.logs {
+                py_dict.set_item("__time__", get_time_py_object(py, log.time, time_as_str)?)?;
+                if let Some(ns) = log.time_ns {
+                    py_dict.set_item("__time_ns__", get_time_py_object(py, ns, time_as_str)?)?;
+                }
+                for content in log.contents {
+                    set_py_dict(&py_dict, &content.key, &content.value, decode_utf8)?;
+                }
+                if let Some(t) = topic {
+                    py_dict.set_item("__topic__", t)?;
+                }
+                if let Some(s) = source {
+                    py_dict.set_item("__source__", s)?;
+                }
+                for (k, v) in &tag_kvs {
+                    py_dict.set_item(k.as_str(), v.as_str())?;
+                }
             }
-            for content in log.contents {
-                set_py_dict(&py_dict, &content.key, &content.value, decode_utf8)?;
-            }
-            if let Some(ref t) = topic {
-                py_dict.set_item("__topic__", t)?;
-            }
-            if let Some(ref s) = source {
-                py_dict.set_item("__source__", s)?;
-            }
-            for (k, v) in &tag_kvs {
-                py_dict.set_item(k.as_str(), v.as_str())?;
-            }
+            vec.push(py_dict);
         }
-        py_list.append(py_dict)?;
+        Ok(vec)
     }
-    Ok(py_list.into())
+    let vec = to_py_dict_vec(py, log_group_list, time_as_str, decode_utf8)?;
+    Ok(PyList::new(py, vec)?.into())
 }
 
+#[inline]
 fn get_time_py_object(py: Python, value: u32, time_as_str: bool) -> PyResult<PyObject> {
     if time_as_str {
         Ok(PyString::new(py, &value.to_string()).into_any().into())
@@ -140,16 +146,17 @@ fn get_time_py_object(py: Python, value: u32, time_as_str: bool) -> PyResult<PyO
     }
 }
 
+#[inline]
 fn set_py_dict(
     py_dict: &Bound<PyDict>,
     key: &str,
-    value: &[u8],
+    value: &bytes::Bytes,
     decode_utf8: bool,
 ) -> PyResult<()> {
     if decode_utf8 {
-        py_dict.set_item(key, std::str::from_utf8(value)?)?;
+        py_dict.set_item(key, std::str::from_utf8(value.as_ref())?)?;
     } else {
-        py_dict.set_item(key, value)?;
+        py_dict.set_item(key, value.as_ref())?;
     }
     Ok(())
 }

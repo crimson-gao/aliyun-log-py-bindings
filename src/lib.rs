@@ -2,9 +2,18 @@ mod error;
 mod json;
 mod log_parser;
 mod macros;
-mod pb;
 
 use pyo3::prelude::*;
+
+#[allow(unused)]
+use prost::Message;
+
+mod pb {
+    // Include the `logs` module, which is generated from logs.proto.
+    include!(concat!(env!("OUT_DIR"), "/sls.logs.rs"));
+    pub type LogGroupListPb = LogGroupList;
+    pub type LogGroupListRawPb = LogGroupListRaw;
+}
 
 /// A Python module implemented in Rust.
 #[pymodule]
@@ -42,18 +51,6 @@ mod aliyun_log_py_bindings {
             Ok(())
         }
     }
-
-    // #[pymodule]
-    // mod pb {
-    //     use super::*;
-    //     use crate::pb::*;
-    //     #[pymodule_init]
-    //     fn init(m: &Bound<'_, PyModule>) -> PyResult<()> {
-    //         m.add_class::<Log>()?;
-    //         m.add_class::<LogGroup>()?;
-    //         Ok(())
-    //     }
-    // }
 
     #[pymodule_init]
     fn init(_m: &Bound<'_, PyModule>) -> PyResult<()> {

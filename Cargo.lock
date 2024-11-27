@@ -15,6 +15,7 @@ dependencies = [
 name = "aliyun_log_py_bindings"
 version = "0.0.1"
 dependencies = [
+ "bytes",
  "lz4",
  "prost",
  "prost-build",
