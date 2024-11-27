@@ -1,6 +1,9 @@
 #!/bin/bash
 set -e
 
+MODE=${1:---release}
+echo "Build on mode MODE"
+
 # 检查 Python 是否安装
 command -v python >/dev/null 2>&1 || { echo "Python is not installed. Exiting." >&2; exit 1; }
 
@@ -17,18 +20,5 @@ source .venv/bin/activate
 # 清除 CONDA_PREFIX 环境变量
 unset CONDA_PREFIX
 
-# 运行 cargo fix 和 cargo fmt
-echo 'Running cargo fix...'
-#cargo fix
-
-echo 'Running cargo fmt...'
-cargo fmt
-if [ $? -ne 0 ]; then
-    echo "Code formatting issues found. Please run 'cargo fmt' to fix them."
-    exit 1
-fi
-
-# 构建 Rust 项目和安装 Python 扩展
-cargo build "$@"
-maturin develop "$@"
-maturin build "$@"
+maturin develop $MODE
+maturin build $MODE
