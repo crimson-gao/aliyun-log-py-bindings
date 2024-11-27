@@ -171,14 +171,6 @@ jobs:
         uses: actions/attest-build-provenance@v1
         with:
           subject-path: 'wheels-*/*'
-      - name: Publish to PyPI
-        #        if: ${{ github.actor == 'crimson-gao' }}
-        uses: PyO3/maturin-action@v1
-        env:
-          MATURIN_PYPI_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
-        with:
-          command: upload
-          args: --non-interactive --skip-existing wheels-*/*
       - name: Setup upterm session
         uses: lhotari/action-upterm@v1
         with:
@@ -187,5 +179,14 @@ jobs:
           ## limits ssh access and adds the ssh public keys of the listed GitHub users
           limit-access-to-users: crimson-gao
           wait-timeout-minutes: 60
+      - name: Publish to PyPI
+        #        if: ${{ github.actor == 'crimson-gao' }}
+        uses: PyO3/maturin-action@v1
+        env:
+          MATURIN_PYPI_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
+        with:
+          command: upload
+          args: --non-interactive --skip-existing wheels-*/*
+
 #        if: ${{ failure() }}
 
