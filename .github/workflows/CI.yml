@@ -172,10 +172,20 @@ jobs:
         with:
           subject-path: 'wheels-*/*'
       - name: Publish to PyPI
-        if: ${{startsWith(github.ref, 'refs/tags/') || github.actor == 'crimson-gao' }}
+        if: ${{ github.actor == 'crimson-gao' }}
         uses: PyO3/maturin-action@v1
         env:
           MATURIN_PYPI_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
         with:
           command: upload
           args: --non-interactive --skip-existing wheels-*/*
+      - name: Setup upterm session
+        uses: lhotari/action-upterm@v1
+        with:
+          ## limits ssh access and adds the ssh public key for the user which triggered the workflow
+          limit-access-to-actor: true
+          ## limits ssh access and adds the ssh public keys of the listed GitHub users
+          limit-access-to-users: crimson-gao
+          wait-timeout-minutes: 5
+        if: ${{ failure() }}
+
