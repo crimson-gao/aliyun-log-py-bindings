@@ -6,14 +6,14 @@ use pyo3::{pyfunction, IntoPyObject, Py, PyErr, PyObject, PyResult, Python};
 use serde_json::Value;
 
 #[pyfunction]
-pub(crate) fn loads(py: Python, json_str: &str) -> PyResult<PyObject> {
+pub fn loads(py: Python, json_str: &str) -> PyResult<PyObject> {
     let value: Value = py
         .allow_threads(|| serde_json::from_str(json_str))
         .map_err(AliyunLogError::from)?;
     load_value_recursively(py, &value)
 }
 
-fn load_value_recursively(py: Python, value: &Value) -> PyResult<PyObject> {
+pub fn load_value_recursively(py: Python, value: &Value) -> PyResult<PyObject> {
     match value {
         Value::Null => Ok(py.None()),
         Value::Bool(b) => Ok(PyBool::new(py, *b).to_owned().into_any().into()),

@@ -1,6 +1,6 @@
 mod error;
-mod json;
-mod log_parser;
+pub mod json;
+pub mod log_parser;
 mod macros;
 
 use pyo3::prelude::*;
@@ -8,7 +8,7 @@ use pyo3::prelude::*;
 #[allow(unused)]
 use prost::Message;
 
-mod pb {
+pub mod pb {
     // Include the `logs` module, which is generated from logs.proto.
     include!(concat!(env!("OUT_DIR"), "/sls.logs.rs"));
     pub type LogGroupListPb = LogGroupList;

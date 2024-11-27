@@ -8,7 +8,7 @@ use pyo3::{pyfunction, Bound, IntoPyObject, PyObject, PyResult, Python};
 use serde_json::{Map, Value};
 
 #[pyfunction]
-pub(crate) fn logs_to_flat_json_str(py: Python, bytes: &[u8]) -> PyResult<String> {
+pub fn logs_to_flat_json_str(py: Python, bytes: &[u8]) -> PyResult<String> {
     py.allow_threads(|| {
         let log_group_list = pb::LogGroupListPb::decode(bytes).map_err(AliyunLogError::from)?;
         Ok(pb_to_flat_json_str(log_group_list))
@@ -16,7 +16,7 @@ pub(crate) fn logs_to_flat_json_str(py: Python, bytes: &[u8]) -> PyResult<String
 }
 
 #[pyfunction]
-pub(crate) fn lz4_logs_to_flat_json_str(
+pub fn lz4_logs_to_flat_json_str(
     py: Python,
     compressed: &[u8],
     raw_size: usize,
@@ -30,7 +30,7 @@ pub(crate) fn lz4_logs_to_flat_json_str(
 }
 
 #[pyfunction]
-pub(crate) fn lz4_logs_to_flat_json(
+pub fn lz4_logs_to_flat_json(
     py: Python,
     bytes: &[u8],
     raw_size: usize,
@@ -46,7 +46,7 @@ pub(crate) fn lz4_logs_to_flat_json(
     log_group_list_to_flat_json_py(py, log_group_list, time_as_str, decode_utf8)
 }
 
-fn logs_to_flat_json_value(log_group_list: pb::LogGroupListPb) -> Value {
+pub fn logs_to_flat_json_value(log_group_list: pb::LogGroupListPb) -> Value {
     let mut logs = Vec::with_capacity(log_group_list.log_groups.len());
     for log_group in log_group_list.log_groups {
         let tag_kvs: Vec<(String, &str)> = log_group
@@ -86,7 +86,7 @@ fn pb_to_flat_json_str(log_group_list: pb::LogGroupListPb) -> String {
     logs_to_flat_json_value(log_group_list).to_string()
 }
 
-fn log_group_list_to_flat_json_py(
+pub fn log_group_list_to_flat_json_py(
     py: Python,
     log_group_list: pb::LogGroupListRawPb,
     time_as_str: bool,

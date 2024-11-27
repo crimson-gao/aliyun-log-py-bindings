@@ -41,6 +41,13 @@ pip install .[dev]
 ./test/test.sh
 ```
 
+## benchmark
+
+```bash
+export BENCHMARK_TEST_WORKDIR="your/workdir/path/with/dataset"
+cargo bench
+```
+
 ## API
 
 支持的 API 可以参考[aliyun_log_py_bindings](aliyun_log_py_bindings)目录下的 pyi 文件

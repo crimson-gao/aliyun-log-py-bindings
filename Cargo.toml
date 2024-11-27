@@ -6,7 +6,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [lib]
 name = "aliyun_log_py_bindings"
-crate-type = ["cdylib"]
+crate-type = ["cdylib", "lib"]
 
 [dependencies]
 prost = "^0.13.3"
@@ -16,6 +16,7 @@ thiserror = "^2.0.3"
 bytes = "1.8.0"
 
 [dev-dependencies]
+criterion = "0.5.1"
 
 [dependencies.pyo3]
 version = "^0.23.1"
@@ -26,3 +27,7 @@ features = ["abi3-py37"]
 prost-build = "^0.13.3"
 protoc-bin-vendored = "^3.1.0"
 
+[[bench]]
+name = "base"
+harness = false
+measurement_time = 20
