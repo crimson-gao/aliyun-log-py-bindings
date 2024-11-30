@@ -152,14 +152,22 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
-        id: setup-python
         with:
           python-version: 'pypy3.10'
+      - run: |
+          python -m pip install maturin && maturin list-python
       - name: Build wheels
         uses: PyO3/maturin-action@v1
         with:
           target: ${{ matrix.platform.target }}
-          args: --release --out dist -i ${{ steps.setup-python.outputs.python-path }}
+          args: --release --out dist --find-interpreter
+          sccache: 'true'
+          manylinux: auto
+      - name: Build wheels
+        uses: PyO3/maturin-action@v1
+        with:
+          target: ${{ matrix.platform.target }}
+          args: list-python
           sccache: 'true'
           manylinux: auto
       - name: Upload wheels
