@@ -154,6 +154,9 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: 'pypy3.10'
+      - run: |
+          which python && python -V
+          whereis python
       - name: Build wheels
         uses: PyO3/maturin-action@v1
         with:
