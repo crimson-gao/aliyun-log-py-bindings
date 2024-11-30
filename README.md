@@ -51,3 +51,7 @@ cargo bench
 ## API
 
 支持的 API 可以参考[aliyun_log_py_bindings](aliyun_log_py_bindings)目录下的 pyi 文件
+
+## 发布版本
+
+打 tag，然后手动运行 Release Workflow，选择对应 tag。
