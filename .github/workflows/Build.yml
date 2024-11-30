@@ -32,7 +32,7 @@ jobs:
             container: quay.io/pypa/manylinux2014_i686:2024.11.30-1
           - runner: ubuntu-latest
             target: aarch64
-            container: quay.io/pypa/manylinux2014_aarch64:2024.11.30-1
+            container: ghcr.io/rust-cross/manylinux2014-cross:aarch64
           - runner: ubuntu-latest
             target: armv7
             container: ghcr.io/rust-cross/manylinux2014-cross:armv7
