@@ -9,7 +9,7 @@ permissions:
   contents: read
 
 jobs:
-  build:
+  check_ungil:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code

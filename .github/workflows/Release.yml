@@ -4,11 +4,14 @@ on:
   workflow_dispatch:
 
 jobs:
-  call_build:
+  build_wheel_before_release:
     uses: ./.github/workflows/Build.yml
+    with:
+      upload-wheel: true
+
   publish:
     name: Publish release to pip
-    needs: call_build
+    needs: build_wheel_before_release
     if: ${{  github.actor == 'crimson-gao' && startsWith(github.ref, 'refs/tags/')}}
     environment: main
     runs-on: ubuntu-latest

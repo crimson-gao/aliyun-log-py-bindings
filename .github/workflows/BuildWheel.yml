@@ -1,0 +1,10 @@
+name: BuildWheel
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build_wheel:
+    uses: ./.github/workflows/Build.yml
+    with:
+      upload-wheel: true
