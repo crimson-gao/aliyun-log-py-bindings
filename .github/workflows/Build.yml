@@ -110,8 +110,7 @@ jobs:
         uses: PyO3/maturin-action@v1
         with:
           target: ${{ matrix.platform.target }}
-          args: >
-          --release --out dist ${{ matrix.platform.python-version == 'pypy3.7' ? 'pypy3.7': '--find-interpreter' } }
+          args: ${{ matrix.platform.python-version == 'pypy3.7' && '--release --out dist pypy3.7' || '--release --out dist  --find-interpreter' } }
           sccache: 'true'
       - name: Upload wheels
         uses: actions/upload-artifact@v4
