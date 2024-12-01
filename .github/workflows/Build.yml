@@ -110,7 +110,7 @@ jobs:
         uses: PyO3/maturin-action@v1
         with:
           target: ${{ matrix.platform.target }}
-          args: ${{ matrix.platform.python-version == 'pypy3.10' && '--release --out dist pypy3.10' || '--release --out dist  --find-interpreter' }}
+          args: ${{ matrix.platform.python-version == 'pypy3.10' && '--release --out dist -i pypy3.10' || '--release --out dist --find-interpreter' }}
           sccache: 'true'
       - name: Upload wheels
         uses: actions/upload-artifact@v4
@@ -144,7 +144,7 @@ jobs:
         uses: PyO3/maturin-action@v1
         with:
           target: ${{ matrix.platform.target }}
-          args: ${{ matrix.platform.python-version == 'pypy3.10' && '--release --out dist pypy3.10' || '--release --out dist  --find-interpreter' }}
+          args: ${{ matrix.platform.python-version == 'pypy3.10' && '--release --out dist -i pypy3.10' || '--release --out dist --find-interpreter' }}
           sccache: 'true'
       - name: Upload wheels
         uses: actions/upload-artifact@v4
