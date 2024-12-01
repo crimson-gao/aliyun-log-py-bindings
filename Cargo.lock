@@ -13,7 +13,7 @@ dependencies = [
 
 [[package]]
 name = "aliyun_log_py_bindings"
-version = "0.0.4"
+version = "0.0.5"
 dependencies = [
  "bytes",
  "criterion",
