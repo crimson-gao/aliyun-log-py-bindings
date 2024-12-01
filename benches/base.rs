@@ -1,4 +1,4 @@
-use aliyun_log_py_bindings::{json, log_parser, pb};
+use aliyun_log_py_bindings::{log_parser, pb};
 use criterion::{criterion_group, criterion_main, BatchSize, Criterion};
 use lz4::block::decompress;
 #[allow(unused)]
@@ -47,20 +47,7 @@ fn criterion_benchmark(c: &mut Criterion) {
     });
 
     {
-        let mut group = c.benchmark_group("serde_json_node encode");
-        group.bench_function("serde_json_node -> flat_json_py(utf8)", |b| {
-            let value = serde_json::from_str::<Value>(&flat_json_str).unwrap();
-            pyo3::prepare_freethreaded_python();
-            b.iter_batched(
-                || value.clone(),
-                |value| {
-                    Python::with_gil(|_py| json::load_value_recursively(_py, &value)).unwrap();
-                },
-                BatchSize::LargeInput,
-            );
-        });
-
-        group.bench_function("serde_json_node -> str", |b| {
+        c.bench_function("serde_json_node -> str", |b| {
             let log_group_list = pb::LogGroupListPb::decode(raw_data.as_slice()).unwrap();
             b.iter_batched(
                 || log_parser::logs_to_flat_json_value(log_group_list.clone()),
@@ -70,7 +57,6 @@ fn criterion_benchmark(c: &mut Criterion) {
                 BatchSize::LargeInput,
             );
         });
-        group.finish();
     }
 
     {
@@ -173,15 +159,6 @@ fn criterion_benchmark(c: &mut Criterion) {
                 });
             });
         });
-        group.bench_function("json.loads", |b| {
-            pyo3::prepare_freethreaded_python();
-            b.iter(|| {
-                Python::with_gil(|_py| {
-                    json::loads(_py, &flat_json_str).unwrap();
-                });
-            });
-        });
-
         group.finish();
     }
 }
