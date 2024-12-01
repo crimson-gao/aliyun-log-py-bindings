@@ -110,12 +110,12 @@ jobs:
         uses: PyO3/maturin-action@v1
         with:
           target: ${{ matrix.platform.target }}
-          args: ${{ matrix.platform.python-version == 'pypy3.10' && '--release --out dist -i pypy3.10' || '--release --out dist --find-interpreter' }}
+          args: --release --out dist --find-interpreter
           sccache: 'true'
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
-          name: wheels-windows-${{ matrix.platform.target }}
+          name: wheels-windows-${{ matrix.platform.target }}-${{  matrix.platform.python-version }}
           path: dist
 
   macos:
@@ -144,12 +144,12 @@ jobs:
         uses: PyO3/maturin-action@v1
         with:
           target: ${{ matrix.platform.target }}
-          args: ${{ matrix.platform.python-version == 'pypy3.10' && '--release --out dist -i pypy3.10' || '--release --out dist --find-interpreter' }}
+          args: --release --out dist --find-interpreter
           sccache: 'true'
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
-          name: wheels-macos-${{ matrix.platform.target }}
+          name: wheels-macos-${{ matrix.platform.target }}-${{  matrix.platform.python-version }}
           path: dist
 
   sdist:
