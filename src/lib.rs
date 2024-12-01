@@ -1,5 +1,4 @@
 mod error;
-pub mod json;
 pub mod log_parser;
 mod macros;
 
@@ -19,20 +18,6 @@ pub mod pb {
 #[pymodule]
 mod aliyun_log_py_bindings {
     use super::*;
-
-    #[pymodule]
-    mod json {
-        use crate::add_py_func;
-        use crate::json::loads;
-        use pyo3::prelude::{PyModule, PyModuleMethods};
-        use pyo3::{wrap_pyfunction, Bound, PyResult};
-
-        #[pymodule_init]
-        fn init(m: &Bound<'_, PyModule>) -> PyResult<()> {
-            add_py_func!(m, loads);
-            Ok(())
-        }
-    }
 
     #[pymodule]
     mod log_parser {
