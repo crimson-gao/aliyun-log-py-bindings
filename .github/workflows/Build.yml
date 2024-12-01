@@ -36,10 +36,6 @@ jobs:
           - runner: ubuntu-latest
             target: armv7
             container: ghcr.io/rust-cross/manylinux2014-cross:armv7
-    #          - runner: ubuntu-latest
-    #            target: s390x
-    #          - runner: ubuntu-latest
-    #            target: ppc64le
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -97,19 +93,25 @@ jobs:
         platform:
           - runner: windows-latest
             target: x64
+            python-version: 3.x
+          - runner: windows-latest
+            target: x64
+            python-version: pypy3.7
           - runner: windows-latest
             target: x86
+            python-version: 3.x
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: 3.x
+          python-version: ${{ matrix.platform.python-version }}
           architecture: ${{ matrix.platform.target }}
       - name: Build wheels
         uses: PyO3/maturin-action@v1
         with:
           target: ${{ matrix.platform.target }}
-          args: --release --out dist --find-interpreter
+          args: >
+          --release --out dist ${{ matrix.platform.python-version == 'pypy3.7' ? 'pypy3.7': '--find-interpreter' } }
           sccache: 'true'
       - name: Upload wheels
         uses: actions/upload-artifact@v4
